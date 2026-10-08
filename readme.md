@@ -27,6 +27,14 @@ Current version: `1.0.0`
 * Notifications and audio cues: [`github.com/gen2brain/beeep`](https://github.com/gen2brain/beeep)
 * macOS integration: AppleScript / JavaScript for Automation (`osascript`)
 
+## Project Structure
+
+```text
+cmd/eyerest/     Application entrypoint and release-time version injection.
+internal/app/    EyeRest tray app logic and platform-specific prompts.
+bin/             Local build outputs.
+```
+
 ## Prerequisites
 
 * Go 1.20 or later.
@@ -49,7 +57,7 @@ sudo dnf install gcc pkgconf-pkg-config libayatana-appindicator-gtk3-devel gtk3-
 ## Run Locally
 
 ```bash
-go run .
+go run ./cmd/eyerest
 ```
 
 ## Build
@@ -57,25 +65,25 @@ go run .
 Build for your current platform:
 
 ```bash
-go build -o EyeRest .
+go build -o bin/EyeRest ./cmd/eyerest
 ```
 
 Build with an explicit semantic version:
 
 ```bash
-go build -ldflags "-X main.appVersion=1.0.0" -o EyeRest .
+go build -ldflags "-X main.version=1.0.0" -o bin/EyeRest ./cmd/eyerest
 ```
 
 Build a Windows binary from macOS or Linux:
 
 ```bash
-GOOS=windows GOARCH=amd64 go build -ldflags "-X main.appVersion=1.0.0" -o EyeRest.exe .
+GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=1.0.0" -o bin/EyeRest.exe ./cmd/eyerest
 ```
 
 Build a Linux binary on Linux:
 
 ```bash
-GOOS=linux GOARCH=amd64 go build -ldflags "-X main.appVersion=1.0.0" -o EyeRest .
+GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=1.0.0" -o bin/EyeRest ./cmd/eyerest
 ```
 
 Linux tray support uses CGO and native desktop libraries, so cross-compiling Linux binaries from macOS usually requires a Linux C toolchain and the AppIndicator/GTK headers for the target platform. The most reliable path is to build Linux releases on Linux or in a Linux container.

@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"fmt"
@@ -14,20 +14,25 @@ var (
 	ticker       *time.Ticker
 	stopChan     chan struct{}
 	isRunning    bool
+	appVersion   = DefaultVersion
 )
 
-func main() {
-	beeep.AppName = appName
+func Run(version string) {
+	if version != "" {
+		appVersion = version
+	}
+
+	beeep.AppName = Name
 	systray.Run(onReady, onExit)
 }
 
 func onReady() {
 	systray.SetTitle("👁️ 20m")
-	systray.SetTooltip(appDisplayName() + " - Pengingat Istirahat Mata 20-20-20")
+	systray.SetTooltip(DisplayName(appVersion) + " - Pengingat Istirahat Mata 20-20-20")
 
 	mStatus := systray.AddMenuItem("Status: Berjalan", "Status timer")
 	mStatus.Disable()
-	mVersion := systray.AddMenuItem("Version: "+appVersion, appDisplayName())
+	mVersion := systray.AddMenuItem("Version: "+appVersion, DisplayName(appVersion))
 	mVersion.Disable()
 	systray.AddSeparator()
 
