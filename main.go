@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os/exec"
 	"time"
 
 	"github.com/gen2brain/beeep"
@@ -18,15 +17,18 @@ var (
 )
 
 func main() {
+	beeep.AppName = appName
 	systray.Run(onReady, onExit)
 }
 
 func onReady() {
 	systray.SetTitle("👁️ 20m")
-	systray.SetTooltip("Pengingat Istirahat Mata 20-20-20")
+	systray.SetTooltip(appDisplayName() + " - Pengingat Istirahat Mata 20-20-20")
 
 	mStatus := systray.AddMenuItem("Status: Berjalan", "Status timer")
 	mStatus.Disable()
+	mVersion := systray.AddMenuItem("Version: "+appVersion, appDisplayName())
+	mVersion.Disable()
 	systray.AddSeparator()
 
 	mToggle := systray.AddMenuItem("Pause Timer", "Hentikan/Jalankan timer")
@@ -91,8 +93,8 @@ func triggerEyeRest() {
 	)
 	_ = beeep.Beep(beeep.DefaultFreq, beeep.DefaultDuration)
 
-	// 2. Tampilkan macOS Fullscreen Transparent Overlay (berjalan asinkron di OS)
-	cmdOverlay := showMacOverlay(int(restDuration.Seconds()))
+	// 2. Tampilkan prompt istirahat sesuai platform.
+	cleanupPrompt := showRestPrompt(int(restDuration.Seconds()))
 
 	// 3. Countdown 20 Detik di Menu Bar
 	for i := int(restDuration.Seconds()); i > 0; i-- {
@@ -100,9 +102,8 @@ func triggerEyeRest() {
 		time.Sleep(1 * time.Second)
 	}
 
-	// Pastikan proses overlay selesai jika belum
-	if cmdOverlay != nil && cmdOverlay.Process != nil {
-		_ = cmdOverlay.Process.Kill()
+	if cleanupPrompt != nil {
+		cleanupPrompt()
 	}
 
 	// 4. Reset Status Menu Bar & Notifikasi Selesai
@@ -112,28 +113,6 @@ func triggerEyeRest() {
 		"Mata sudah rileks. Selamat mengoding kembali!",
 		"",
 	)
-}
-
-// showMacOverlay memanfaatkan osascript (JavaScript for Automation)
-// untuk membuat jendela transparan penuh di macOS selama N detik.
-func showMacOverlay(durationSec int) *exec.Cmd {
-	jsScript := fmt.Sprintf(`
-		var app = Application.currentApplication();
-		app.includeStandardAdditions = true;
-		
-		// Buat dialog transparan penuh dengan AppleScript/JSA
-		try {
-			app.displayAlert("👀 WAKTUNYA ISTIRAHAT MATA (20 DETIK)", {
-				message: "Pandanglah objek yang jauh (minimal 6 meter / 20 kaki).\nLayar ini akan menutup otomatis.",
-				as: "critical",
-				givingUpAfter: %d
-			});
-		} catch(e) {}
-	`, durationSec)
-
-	cmd := exec.Command("osascript", "-l", "JavaScript", "-e", jsScript)
-	_ = cmd.Start() // Jalankan secara background
-	return cmd
 }
 
 func onExit() {
