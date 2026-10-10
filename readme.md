@@ -14,11 +14,12 @@ Current version: `1.0.0`
 
 * Native system tray/menu bar app on macOS, Windows, and Linux.
 * Dynamic tray indicators: `20m`, `20s`, and paused states.
-* 20-second break prompt:
+* Customizable rest duration from the tray menu, saved to the user's config directory.
+* Rest prompt:
   * macOS uses an auto-closing native `osascript` alert.
   * Windows and Linux use the cross-platform `beeep` alert/notification fallback.
 * System notifications and audio cues.
-* Manual pause/resume and "rest now" controls from the tray menu.
+* Manual pause/resume, rest duration, and "rest now" controls from the tray menu.
 
 ## Tech Stack
 
@@ -71,7 +72,7 @@ go build -o bin/EyeRest ./cmd/eyerest
 Build with an explicit semantic version:
 
 ```bash
-go build -ldflags "-X main.version=1.0.0" -o bin/EyeRest ./cmd/eyerest
+go build -ldflags "-X main.version=1.0.0" -o cmd/eyerest/bin/EyeRest ./cmd/eyerest
 ```
 
 Build a Windows binary from macOS or Linux:
